@@ -5,6 +5,7 @@ import { renderRoomLabels } from "./room";
 import { renderHUD } from "./hud";
 import { renderMiniMap } from "./minimap";
 import { renderJoystick } from "./joystick";
+import { renderWelcome } from "./game_master/welcome";
 
 export function render(ctx) {
   ctx.fillStyle = "black";
@@ -17,4 +18,6 @@ export function render(ctx) {
   renderHUD(ctx);
   renderMiniMap(ctx);
   renderJoystick(ctx);
+
+  renderWelcome(ctx);
 }

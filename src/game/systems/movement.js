@@ -2,12 +2,17 @@ import { keys } from "../input/keyboard";
 import { joystick } from "../state/joystick";
 import { player } from "../state/player";
 import { camera } from "../state/camera";
+import { gameState } from "../state/gameState";
 import { updateObservation } from "./observation";
 import { resolveWallPenetration } from "./collision";
 import { checkPickupCollision } from "./pickups";
 import { JOYSTICK_DEADZONE, JOYSTICK_RADIUS } from "../configs";
 
 export function update(dt, ctx) {
+  if (!gameState.started) {
+    return; // world updates, player frozen
+  }
+  
   // --- Movement intent ---
   let dx = 0;
   let dy = 0;
