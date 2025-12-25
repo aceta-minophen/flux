@@ -1,21 +1,22 @@
+import { TILE_SIZE, ROOM_COUNT } from "../game/configs";
+
 // Infinite tile store
 const tiles = new Map();
 
-export const TILE_SIZE = 40;
 
 /* ======================
    ROOM GENERATION
 ====================== */
 
 const rooms = [];
-const ROOM_COUNT = 5;
 
-function createRoom(cx, cy, w, h) {
-  rooms.push({ cx, cy, w, h });
+function createRoom(id, cx, cy, w, h) {
+  rooms.push({ id, cx, cy, w, h });
 }
 
-function isInRoom(tx, ty) {
-  return rooms.some(
+
+function getRoomAt(tx, ty) {
+  return rooms.find(
     r =>
       tx >= r.cx &&
       tx < r.cx + r.w &&
@@ -24,18 +25,20 @@ function isInRoom(tx, ty) {
   );
 }
 
+
 // Generate rooms once
 (function generateRooms() {
   for (let i = 0; i < ROOM_COUNT; i++) {
-    const w = 5 + Math.floor(Math.random() * 4); // 5–20
+    const w = 5 + Math.floor(Math.random() * 4);
     const h = 5 + Math.floor(Math.random() * 4);
 
     const cx = Math.floor(Math.random() * 50) - 25;
     const cy = Math.floor(Math.random() * 50) - 25;
 
-    createRoom(cx, cy, w, h);
+    createRoom(i + 1, cx, cy, w, h); // room numbers start at 1
   }
 })();
+
 
 /* ======================
    TILE ACCESS
@@ -49,12 +52,14 @@ export function getTile(tx, ty) {
   const k = key(tx, ty);
   if (tiles.has(k)) return tiles.get(k);
 
-  const zone = isInRoom(tx, ty) ? "room" : "corridor";
+  const room = getRoomAt(tx, ty);
+  const zone = room ? "room" : "corridor";
 
   const tile = {
     confidence: 0,
     flickerSeed: Math.random() * 1000,
     zone,
+    roomId: room ? room.id : null,
     edges: {
       n: "unknown",
       e: "unknown",
@@ -63,14 +68,23 @@ export function getTile(tx, ty) {
     },
   };
 
-  // Rooms are always open
-  if (zone === "room") {
-    tile.edges.n = "open";
-    tile.edges.e = "open";
-    tile.edges.s = "open";
-    tile.edges.w = "open";
+  if (room) {
+    const left   = tx === room.cx;
+    const right  = tx === room.cx + room.w - 1;
+    const top    = ty === room.cy;
+    const bottom = ty === room.cy + room.h - 1;
+
+    tile.edges.n = top    ? "wall" : "open";
+    tile.edges.s = bottom ? "wall" : "open";
+    tile.edges.w = left   ? "wall" : "open";
+    tile.edges.e = right  ? "wall" : "open";
   }
+
 
   tiles.set(k, tile);
   return tile;
+}
+
+export function getAllRooms() {
+  return rooms;
 }

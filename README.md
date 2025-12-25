@@ -20,7 +20,7 @@ Ideas:
 1. After one point, the player speed starts decreasing once they have collected sufficient no. of pickups
 2. If the player stays stationary, the probability of the edges collapsing into a solid wall becomes higher with time until the player is ultimately trapped - also affects slow speed
 3. Quest 1: Collect sufficient pickups
-4. One type of gem allows to break the walls so that you can either rescue yourself or your fellow player
+4. One type of tool allows to break the walls so that you can either rescue yourself or your fellow player
 5. New pickups appear even in places already visited
 6. Player can vote to make a room their homebase; in case of a non-unanimous vote, the room with majority disappears, in case of no majority, the rooms with equal no. of votes disappear
 7. Rooms are safe hubs; from whom? monsters (mechanics to be decided).

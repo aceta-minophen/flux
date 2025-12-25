@@ -1,21 +1,6 @@
 import { keys } from "./input";
-import { TILE_SIZE, getTile } from "./world/grid";
-
-/* ======================
-   CONFIG
-====================== */
-
-const OBSERVATION_RADIUS = 180;
-const PASSIVE_GAIN = 0.04;
-const ACTIVE_GAIN = 0.35;
-const COLLAPSE_THRESHOLD = 0.85;
-
-const PLAYER_RADIUS = 6; // physical radius (IMPORTANT)
-const MAX_SPEED = 220;
-
-const MINIMAP_RADIUS = 70;
-const MINIMAP_PADDING = 12;
-
+import { OBSERVATION_RADIUS, ACTIVE_GAIN, PASSIVE_GAIN, COLLAPSE_THRESHOLD, PLAYER_RADIUS, MAX_SPEED, MINIMAP_RADIUS, MINIMAP_PADDING, TILE_SIZE } from "./configs";
+import { getTile, getAllRooms } from "../world/grid";
 
 /* ======================
    STATE
@@ -61,8 +46,7 @@ const joystick = {
 const JOYSTICK_RADIUS = 40;
 const JOYSTICK_DEADZONE = 6;
 
-const isTouchDevice = true;
-  // "ontouchstart" in window || navigator.maxTouchPoints > 0;
+const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
 /* ======================
    LOOP
@@ -307,6 +291,7 @@ function render(ctx) {
   renderGrid(ctx);
   renderPickups(ctx);
   renderPlayer(ctx);
+  renderRoomLabels(ctx);
   renderHUD(ctx);
   renderMiniMap(ctx);
   renderJoystick(ctx);
@@ -342,7 +327,7 @@ function renderGrid(ctx) {
 }
 
 function renderPickups(ctx) {
-  ctx.fillStyle = "rgba(80,160,255,0.9)";
+  ctx.fillStyle = "rgba(80, 159, 255, 0.59)";
 
   for (const [key, pickup] of pickups.entries()) {
     if (pickup.collected) continue;
@@ -415,6 +400,10 @@ function renderMiniMap(ctx) {
   );
 
   ctx.save();
+
+
+  // 🔑 Reset transform so minimap is drawn in screen space
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
 
   // --- Circular mask ---
   ctx.beginPath();
@@ -651,4 +640,21 @@ function maybeSpawnPickup(tx, ty, tile) {
       collected: false,
     });
   }
+}
+
+function renderRoomLabels(ctx) {
+  ctx.save();
+  ctx.font = "14px monospace";
+  ctx.fillStyle = "rgba(255,255,255,0.6)";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+
+  for (const room of getAllRooms()) {
+    const x = Math.round(room.cx * TILE_SIZE - camera.x + 4);
+    const y = Math.round(room.cy * TILE_SIZE - camera.y + 4);
+
+    ctx.fillText(`Room ${room.id}`, x, y);
+  }
+
+  ctx.restore();
 }
